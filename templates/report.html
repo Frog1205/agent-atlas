@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAMC 评估报告 — {{USER_ROLE}}</title>
+<meta property="og:title" content="DAMC AI时代价值评估报告">
+<meta property="og:description" content="{{ARCHETYPE_TAGLINE}}">
+<meta name="description" content="DAMC 评估报告 — AI时代个人价值自动评估">
+<style>
+  :root {
+    --bg-primary: #06060f;
+    --bg-secondary: #0d0d1a;
+    --bg-card: rgba(255,255,255,0.04);
+    --bg-card-hover: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --text-primary: #e8e8ef;
+    --text-secondary: #8888a0;
+    --text-muted: #55556a;
+    --color-d: #00d4ff;
+    --color-a: #ff006e;
+    --color-m: #00ff88;
+    --color-c: #ffbe0b;
+    --color-d-dim: rgba(0,212,255,0.15);
+    --color-a-dim: rgba(255,0,110,0.15);
+    --color-m-dim: rgba(0,255,136,0.15);
+    --color-c-dim: rgba(255,190,11,0.15);
+    --glow-d: 0 0 20px rgba(0,212,255,0.3);
+    --glow-a: 0 0 20px rgba(255,0,110,0.3);
+    --glow-m: 0 0 20px rgba(0,255,136,0.3);
+    --glow-c: 0 0 20px rgba(255,190,11,0.3);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--color-d), var(--color-a), var(--color-m), var(--color-c));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header .subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  /* Archetype Hero */
+  .archetype {
+    text-align: center;
+    padding: 40px 32px;
+    margin-bottom: 40px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+  }
+  .archetype::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-d), var(--color-a), var(--color-m), var(--color-c));
+  }
+  .archetype .emoji {
+    font-size: 56px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .archetype .name {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .archetype .tagline {
+    color: var(--text-secondary);
+    font-size: 16px;
+    max-width: 500px;
+    margin: 0 auto 20px;
+  }
+  .overall-score {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .overall-score .number {
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .overall-score .unit {
+    font-size: 20px;
+    color: var(--text-secondary);
+  }
+  .overall-score .grade {
+    font-size: 20px;
+    font-weight: 700;
+    margin-left: 12px;
+    padding: 4px 12px;
+    border-radius: 8px;
+  }
+
+  /* Radar Chart */
+  .radar-section {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+  }
+  .radar-wrapper {
+    position: relative;
+    width: 320px;
+    height: 320px;
+  }
+  .radar-label {
+    position: absolute;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .radar-label .score {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-top: 2px;
+  }
+  .radar-label-d { top: -8px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--color-d); }
+  .radar-label-a { top: 50%; right: -60px; transform: translateY(-50%); text-align: left; color: var(--color-a); }
+  .radar-label-m { bottom: -8px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--color-m); }
+  .radar-label-c { top: 50%; left: -55px; transform: translateY(-50%); text-align: right; color: var(--color-c); }
+
+  /* Score Cards */
+  .scores-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .score-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .score-card:hover {
+    background: var(--bg-card-hover);
+  }
+  .score-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .score-card .dim-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .score-card .dim-score {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  .score-card .dim-name {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .sub-score {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .sub-score .sub-label {
+    width: 80px;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sub-score .bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .sub-score .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    width: 0;
+  }
+  .sub-score .sub-val {
+    width: 28px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Color variants */
+  .card-d { border-top: 2px solid var(--color-d); }
+  .card-d .dim-label, .card-d .dim-score { color: var(--color-d); }
+  .card-d .bar-fill { background: linear-gradient(90deg, var(--color-d-dim), var(--color-d)); }
+  .card-d .sub-val { color: var(--color-d); }
+
+  .card-a { border-top: 2px solid var(--color-a); }
+  .card-a .dim-label, .card-a .dim-score { color: var(--color-a); }
+  .card-a .bar-fill { background: linear-gradient(90deg, var(--color-a-dim), var(--color-a)); }
+  .card-a .sub-val { color: var(--color-a); }
+
+  .card-m { border-top: 2px solid var(--color-m); }
+  .card-m .dim-label, .card-m .dim-score { color: var(--color-m); }
+  .card-m .bar-fill { background: linear-gradient(90deg, var(--color-m-dim), var(--color-m)); }
+  .card-m .sub-val { color: var(--color-m); }
+
+  .card-c { border-top: 2px solid var(--color-c); }
+  .card-c .dim-label, .card-c .dim-score { color: var(--color-c); }
+  .card-c .bar-fill { background: linear-gradient(90deg, var(--color-c-dim), var(--color-c)); }
+  .card-c .sub-val { color: var(--color-c); }
+
+  /* Insights Section */
+  .insights {
+    margin-bottom: 40px;
+  }
+  .insights h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .insight-group {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .insight-group h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .insight-group ul {
+    list-style: none;
+    padding: 0;
+  }
+  .insight-group li {
+    padding: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .insight-group li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .insight-group.distill li::before { background: var(--color-d); box-shadow: var(--glow-d); }
+  .insight-group.moat li::before { background: var(--color-a); box-shadow: var(--glow-a); }
+  .insight-group.risk li::before { background: #ff4444; box-shadow: 0 0 20px rgba(255,68,68,0.3); }
+  .insight-group.action li::before { background: var(--color-m); box-shadow: var(--glow-m); }
+  .insight-group.action li {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Scan Evidence */
+  .scan-evidence {
+    margin-bottom: 40px;
+  }
+  .scan-evidence h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .evidence-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+  }
+  .evidence-item .ev-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+  }
+  .evidence-item .ev-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+  .footer .powered {
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container { padding: 24px 16px 60px; }
+    .header h1 { font-size: 28px; }
+    .archetype .emoji { font-size: 40px; }
+    .archetype .name { font-size: 22px; }
+    .overall-score .number { font-size: 48px; }
+    .scores-grid { grid-template-columns: 1fr; }
+    .evidence-grid { grid-template-columns: repeat(2, 1fr); }
+    .radar-wrapper { width: 260px; height: 260px; }
+    .radar-label-a { right: -50px; }
+    .radar-label-c { left: -45px; }
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: fadeUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+  .delay-6 { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header animate-in">
+    <div class="badge">DAMC Assessment</div>
+    <h1>AI 时代价值评估报告</h1>
+    <div class="subtitle" id="subtitle"></div>
+  </div>
+
+  <!-- Archetype Hero -->
+  <div class="archetype animate-in delay-1" id="archetype">
+    <span class="emoji" id="arch-emoji"></span>
+    <div class="name" id="arch-name"></div>
+    <div class="tagline" id="arch-tagline"></div>
+    <div class="overall-score">
+      <span class="number" id="overall-num"></span>
+      <span class="unit">/100</span>
+      <span class="grade" id="overall-grade"></span>
+    </div>
+  </div>
+
+  <!-- Radar Chart -->
+  <div class="radar-section animate-in delay-2">
+    <div class="radar-wrapper">
+      <svg id="radar" viewBox="0 0 300 300" width="100%" height="100%"></svg>
+      <div class="radar-label radar-label-d">D<span class="score" id="rl-d"></span></div>
+      <div class="radar-label radar-label-a">A<span class="score" id="rl-a"></span></div>
+      <div class="radar-label radar-label-m">M<span class="score" id="rl-m"></span></div>
+      <div class="radar-label radar-label-c">C<span class="score" id="rl-c"></span></div>
+    </div>
+  </div>
+
+  <!-- Score Cards -->
+  <div class="scores-grid" id="scores-grid">
+    <!-- Populated by JS -->
+  </div>
+
+  <!-- Scan Evidence -->
+  <div class="scan-evidence animate-in delay-4" id="scan-section">
+    <h2>扫描数据</h2>
+    <div class="evidence-grid" id="evidence-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- Insights -->
+  <div class="insights animate-in delay-5" id="insights-section">
+    <h2>洞察与建议</h2>
+    <div id="insights-content"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer animate-in delay-6">
+    <div>Generated on <span id="gen-date"></span></div>
+    <div class="powered">Powered by DAMC Model &middot; Claude Code</div>
+  </div>
+</div>
+
+<script>
+// ===== DATA INJECTION POINT =====
+// Claude will replace this entire block with actual data
+window.DAMC_DATA = {{DAMC_DATA_JSON}};
+// ===== END DATA =====
+
+(function() {
+  const D = window.DAMC_DATA;
+  if (!D) return;
+
+  // Header
+  document.getElementById('subtitle').textContent = D.userName + (D.mbti ? ' · ' + D.mbti : '') + ' · ' + D.date;
+
+  // Archetype
+  document.getElementById('arch-emoji').textContent = D.archetype.emoji;
+  document.getElementById('arch-name').textContent = D.archetype.name;
+  document.getElementById('arch-tagline').textContent = D.archetype.tagline;
+  document.getElementById('overall-num').textContent = D.overall;
+
+  const gradeEl = document.getElementById('overall-grade');
+  let grade, gradeColor;
+  if (D.overall >= 90) { grade = 'S'; gradeColor = 'var(--color-m)'; }
+  else if (D.overall >= 75) { grade = 'A'; gradeColor = 'var(--color-d)'; }
+  else if (D.overall >= 60) { grade = 'B'; gradeColor = 'var(--color-c)'; }
+  else if (D.overall >= 45) { grade = 'C'; gradeColor = '#ff8844'; }
+  else if (D.overall >= 30) { grade = 'D'; gradeColor = 'var(--color-a)'; }
+  else { grade = 'F'; gradeColor = '#ff4444'; }
+  gradeEl.textContent = grade;
+  gradeEl.style.background = gradeColor.replace(')', ',0.15)').replace('var(', '').replace('--color-m', 'rgba(0,255,136').replace('--color-d', 'rgba(0,212,255').replace('--color-c', 'rgba(255,190,11').replace('--color-a', 'rgba(255,0,110');
+  gradeEl.style.color = gradeColor;
+
+  // Radar labels
+  document.getElementById('rl-d').textContent = D.scores.D.total;
+  document.getElementById('rl-a').textContent = D.scores.A.total;
+  document.getElementById('rl-m').textContent = D.scores.M.total;
+  document.getElementById('rl-c').textContent = D.scores.C.total;
+
+  // Draw radar
+  drawRadar(D.scores.D.total, D.scores.A.total, D.scores.M.total, D.scores.C.total);
+
+  // Score cards
+  const grid = document.getElementById('scores-grid');
+  const dims = [
+    { key: 'D', label: 'DISTILL', name: '蒸馏价值', cls: 'card-d', color: 'var(--color-d)',
+      subLabels: { expertise: '领域专精', methodology: '方法论', codifiability: '可编码性', standardization: '标准化', demand: '市场需求' } },
+    { key: 'A', label: 'ANTI', name: '抗蒸馏指数', cls: 'card-a', color: 'var(--color-a)',
+      subLabels: { creativity: '创造力', eq: '情商', crossDomain: '跨域综合', ambiguity: '模糊决策', physical: '身体在场', trust: '信任资产' } },
+    { key: 'M', label: 'MASTERY', name: 'AI 驾驭能力', cls: 'card-m', color: 'var(--color-m)',
+      subLabels: { environment: '环境配置', skills: 'Skill生态', automation: '自动化集成', memory: '记忆系统', advanced: '高级功能' } },
+    { key: 'C', label: 'COMPASS', name: '职业适配', cls: 'card-c', color: 'var(--color-c)',
+      subLabels: {} }
+  ];
+
+  dims.forEach((dim, i) => {
+    const data = D.scores[dim.key];
+    const card = document.createElement('div');
+    card.className = 'score-card ' + dim.cls + ' animate-in delay-' + (i + 3);
+
+    let subsHTML = '';
+    const subs = data.subs || {};
+    const maxSub = dim.key === 'M' ? 25 : 100;
+    Object.keys(subs).forEach(k => {
+      const label = dim.subLabels[k] || k;
+      const val = subs[k];
+      const pct = dim.key === 'M' ? Math.min(100, (val / maxSub) * 100) : val;
+      subsHTML += '<div class="sub-score"><span class="sub-label" title="' + label + '">' + label + '</span><div class="bar-track"><div class="bar-fill" data-width="' + pct + '"></div></div><span class="sub-val">' + val + '</span></div>';
+    });
+
+    // For C dimension, show career paths instead of subs
+    if (dim.key === 'C' && data.fit) {
+      subsHTML = '<div style="margin-top:4px;"><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">适配方向: <strong style="color:var(--text-primary)">' + data.fit + '</strong></div>';
+      if (data.paths) {
+        data.paths.forEach(p => {
+          subsHTML += '<div style="font-size:13px;color:var(--text-secondary);padding:4px 0;padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--color-c);">→</span> ' + p + '</div>';
+        });
+      }
+      subsHTML += '</div>';
+    }
+
+    card.innerHTML = '<div class="card-header"><span class="dim-label">' + dim.label + '</span><span class="dim-score">' + data.total + '</span></div><div class="dim-name">' + dim.name + '</div>' + subsHTML;
+    grid.appendChild(card);
+  });
+
+  // Scan evidence
+  const evGrid = document.getElementById('evidence-grid');
+  const evItems = [
+    { key: 'totalSkills', label: 'Skills 总数' },
+    { key: 'customSkills', label: '自建 Skills' },
+    { key: 'hooksCount', label: 'Hooks 配置' },
+    { key: 'mcpServers', label: 'MCP 服务器' },
+    { key: 'memoryFiles', label: '记忆文件' },
+    { key: 'claudeMdLines', label: 'CLAUDE.md 行数' },
+    { key: 'aiCommits', label: 'AI 协作提交' },
+    { key: 'totalCommits', label: '总提交数' }
+  ];
+  const scan = D.scanSummary || {};
+  evItems.forEach(item => {
+    const val = scan[item.key];
+    if (val === undefined || val === null) return;
+    const el = document.createElement('div');
+    el.className = 'evidence-item';
+    el.innerHTML = '<div class="ev-value">' + val + '</div><div class="ev-label">' + item.label + '</div>';
+    evGrid.appendChild(el);
+  });
+
+  // Insights
+  const insContent = document.getElementById('insights-content');
+  const ins = D.insights || {};
+  const groups = [
+    { key: 'distillTargets', title: '值得蒸馏的能力', icon: '🧬', cls: 'distill' },
+    { key: 'moats', title: '你的护城河', icon: '🏰', cls: 'moat' },
+    { key: 'risks', title: '风险预警', icon: '⚠️', cls: 'risk' },
+    { key: 'actions', title: '行动建议', icon: '🚀', cls: 'action' }
+  ];
+  groups.forEach(g => {
+    const items = ins[g.key];
+    if (!items || items.length === 0) return;
+    const div = document.createElement('div');
+    div.className = 'insight-group ' + g.cls;
+    div.innerHTML = '<h3>' + g.icon + ' ' + g.title + '</h3><ul>' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
+    insContent.appendChild(div);
+  });
+
+  // Date
+  document.getElementById('gen-date').textContent = D.date;
+
+  // Animate bars after a short delay
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width + '%';
+    });
+  }, 800);
+
+})();
+
+function drawRadar(d, a, m, c) {
+  const svg = document.getElementById('radar');
+  const cx = 150, cy = 150, r = 110;
+
+  // Grid lines
+  let gridHTML = '';
+  [0.25, 0.5, 0.75, 1].forEach(scale => {
+    const rr = r * scale;
+    const points = [
+      [cx, cy - rr],
+      [cx + rr, cy],
+      [cx, cy + rr],
+      [cx - rr, cy]
+    ].map(p => p.join(',')).join(' ');
+    gridHTML += '<polygon points="' + points + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+  });
+
+  // Axes
+  gridHTML += '<line x1="' + cx + '" y1="' + (cy - r) + '" x2="' + cx + '" y2="' + (cy + r) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+  gridHTML += '<line x1="' + (cx - r) + '" y1="' + cy + '" x2="' + (cx + r) + '" y2="' + cy + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+
+  // Data polygon
+  const pts = [
+    [cx, cy - (d / 100 * r)],
+    [cx + (a / 100 * r), cy],
+    [cx, cy + (m / 100 * r)],
+    [cx - (c / 100 * r), cy]
+  ];
+  const pointsStr = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+
+  gridHTML += '<polygon points="' + pointsStr + '" fill="url(#radarGrad)" stroke="url(#radarStroke)" stroke-width="2" opacity="0.85"/>';
+
+  // Dots
+  const colors = ['var(--color-d)', 'var(--color-a)', 'var(--color-m)', 'var(--color-c)'];
+  pts.forEach((p, i) => {
+    gridHTML += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="4" fill="' + colors[i] + '" stroke="var(--bg-primary)" stroke-width="2"/>';
+  });
+
+  svg.innerHTML = '<defs>' +
+    '<linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+    '<stop offset="0%" stop-color="rgba(0,212,255,0.12)"/>' +
+    '<stop offset="50%" stop-color="rgba(255,0,110,0.08)"/>' +
+    '<stop offset="100%" stop-color="rgba(0,255,136,0.12)"/>' +
+    '</linearGradient>' +
+    '<linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">' +
+    '<stop offset="0%" stop-color="rgba(0,212,255,0.8)"/>' +
+    '<stop offset="33%" stop-color="rgba(255,0,110,0.8)"/>' +
+    '<stop offset="66%" stop-color="rgba(0,255,136,0.8)"/>' +
+    '<stop offset="100%" stop-color="rgba(255,190,11,0.8)"/>' +
+    '</linearGradient>' +
+    '</defs>' + gridHTML;
+}
+</script>
+</body>
+</html>
